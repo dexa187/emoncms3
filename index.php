@@ -27,7 +27,7 @@
   require "Models/user_model.php";
   $e = db_connect();
 
-  $q = preg_replace('/[^.\/a-z]/','',$_GET['q']); // filter out all except a-z / . 
+  $q = preg_replace('/[^.\/A-z]/','',$_GET['q']); // filter out all except a-z / . 
   $q = db_real_escape_string($q);		  // second layer
   $args = preg_split( '/[\/.]/',$q);		  // split string at / .
 
@@ -50,7 +50,9 @@
 
   if ($format == 'json')
   {
-    print $content;
+	header('content-type: application/json; charset=utf-8');
+	header("access-control-allow-origin: *");
+    echo $_GET['callback'] .$content;
     if (!$content) print "Sorry, you need a valid apikey or be logged in to see this page";
   }
 
