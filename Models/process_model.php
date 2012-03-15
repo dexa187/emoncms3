@@ -34,6 +34,8 @@
     $list[11] = array( "+ input",		1,		"add_input"		);
     $list[12] = array( "/ input" ,		0,		"divide"		);
     $list[13] = array( "phaseshift" ,		0,		"phaseshift"		);
+    $list[14] = array( "Subtract from feed",	2,		"subtract_from" );
+    $list[15] = array( "Add to feed",		2,		"add_to" 			);
     // $list[14] = array( "save_to_input" ,	4,		"save_to_input"		);
     // $list[15] = array( "+ feed",		3,		"add_feed"		);
 
@@ -148,13 +150,93 @@
       $last_time = strtotime($last_row['time']);
       // kWh calculation
       $time_elapsed = ($time_now - $last_time);
+      //error_log("Time elapsed  $time_elapsed");
       $kwh_inc = ($time_elapsed * $value) / 3600000;
       $new_kwh = $last_kwh + $kwh_inc;
+      //error_log("Adding  $kwh_inc to $last_kwh");
     }
 
     // update kwhd feed
     db_query("UPDATE $feedname SET data = '$new_kwh' WHERE time = '$time'");
 
+    $updatetime = date("Y-n-j H:i:s",     $time_now);
+    db_query("UPDATE feeds SET value = '$new_kwh', time = '$updatetime' WHERE id='$feedid'");
+
+    return $kwh_inc;
+  }
+  
+  //---------------------------------------------------------------------------------------
+  // Subtract from a Feed
+  //---------------------------------------------------------------------------------------
+  function subtract_from($feedid,$time_now,$value)
+  {
+    $feedname = "feed_".trim($feedid)."";
+    $new_kwh = 0;
+
+    $time = date('y/m/d', mktime(0, 0, 0, date("m") , date("d") , date("Y")));
+
+    // Get last value
+    $result = db_query("SELECT * FROM $feedname WHERE time = '$time'");
+    $last_row = db_fetch_array($result);
+
+    if (!$last_row)
+    {
+      $result = db_query("INSERT INTO $feedname (time,data) VALUES ('$time','0.0')");
+
+    $updatetime = date("Y-n-j H:i:s", $time_now);
+    db_query("UPDATE feeds SET value = '0.0', time = '$updatetime' WHERE id='$feedid'");
+    }
+    else
+    {
+      $result = db_query("SELECT * FROM feeds WHERE id = '$feedid'");
+      $last_row = db_fetch_array($result);
+      $last_kwh = $last_row['value'];
+      // kWh calculation
+      $new_kwh = $last_kwh - $value;
+      //error_log("Subtracting  $value from $last_kwh");
+    }
+
+    // update kwhd feed
+    db_query("UPDATE $feedname SET data = '$new_kwh' WHERE time = '$time'");
+    $updatetime = date("Y-n-j H:i:s",     $time_now);
+    db_query("UPDATE feeds SET value = '$new_kwh',time = '$updatetime' WHERE id='$feedid'");
+
+    return $value;
+  }
+  
+  //---------------------------------------------------------------------------------------
+  // Add to a Feed
+  //---------------------------------------------------------------------------------------
+  function add_to($feedid,$time_now,$value)
+  {
+    $feedname = "feed_".trim($feedid)."";
+    $new_kwh = 0;
+
+    $time = date('y/m/d', mktime(0, 0, 0, date("m") , date("d") , date("Y")));
+
+    // Get last value
+    $result = db_query("SELECT * FROM $feedname WHERE time = '$time'");
+    $last_row = db_fetch_array($result);
+
+    if (!$last_row)
+    {
+      $result = db_query("INSERT INTO $feedname (time,data) VALUES ('$time','0.0')");
+
+    $updatetime = date("Y-n-j H:i:s", $time_now);
+    db_query("UPDATE feeds SET value = '0.0', time = '$updatetime' WHERE id='$feedid'");
+    }
+    else
+    {
+      $result = db_query("SELECT * FROM feeds WHERE id = '$feedid'");
+      $last_row = db_fetch_array($result);
+      $last_kwh = $last_row['value'];
+      // kWh calculation
+      $new_kwh = $last_kwh + $value;
+      //error_log("Adding $value to $last_kwh");
+    }
+
+    // update kwhd feed
+    db_query("UPDATE $feedname SET data = '$new_kwh' WHERE time = '$time'");
     $updatetime = date("Y-n-j H:i:s",     $time_now);
     db_query("UPDATE feeds SET value = '$new_kwh', time = '$updatetime' WHERE id='$feedid'");
 
@@ -306,6 +388,20 @@ function save_to_input($arg,$time,$value)
 
   return $value;
 }
+
+
+  function get_id_from_dev($dev)
+  {
+    $result = db_query("SELECT id FROM users WHERE username=$dev");
+    if ($result)
+    {
+      $row = db_fetch_array($result);
+      $apikey = $row['id'];
+    }
+    return $apikey;
+  }
+
+   
 
 ?>
 
