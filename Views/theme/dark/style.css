@@ -63,6 +63,23 @@ height:100%;
   font-weight:bold;
   }
 
+  .compare { 
+  position: relative; /* IE is dumb */
+  border: 1px solid black;
+  width: 200px;  
+  padding: 2px; 
+  }
+  
+  .compare .bar { 
+        display: block;
+        position: relative;
+        background: green; 
+        text-align: center; 
+        color: #333; 
+        height: 2em; 
+        line-height: 2em;            
+    }
+    .compare .bar span { position: absolute; left: 1em; }
 
   .dial {
   padding:0px;
