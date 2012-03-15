@@ -22,15 +22,20 @@
         {
           return get_range(data,Date.UTC(year,month,1),Date.UTC(year,month+1,1));
         }
+        
+        function get_last30_days(data,day,month,year)
+        {
+          return get_range(data,Date.UTC(year,month,day)-2592000000,Date.UTC(year,month+1,day));
+        }
 
         function get_months(data)
         {
           var gdata = [];
-
           var sum=0, s=0, i=0;
           var lmonth=0,month=0,year;
           var tmp = []
           var d = new Date();
+          var localOffset = d.getTimezoneOffset() * 60000;
 
           for (var z in data)
           {
@@ -46,16 +51,19 @@
             if (month!=lmonth && z!=0)
             { 
               var tmp = [];
-              tmp[0] = Date.UTC(year,month-1,1);
-              tmp[1] = sum/daysInMonth(month, year);
+              tmp[0] = Date.UTC(year,month-1,1)+localOffset;
+              //tmp[1] = sum/daysInMonth(month, year);
+              tmp[1] = sum;
 
               gdata[i] = tmp; i++;
               sum = 0; s = 0;
             }
           } 
           var tmp = [];
-          tmp[0] = Date.UTC(year,month,1);
-          tmp[1] = sum/daysInMonth(month, year);
+
+          tmp[0] = Date.UTC(year,month,1)+localOffset;
+          //tmp[1] = sum/daysInMonth(month, year);
+          tmp[1] = sum;
           gdata[i] = tmp;
 
           return gdata;
