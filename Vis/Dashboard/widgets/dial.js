@@ -37,7 +37,7 @@
   ctx.fill();
 
   pos += width;
-  ctx.fillStyle = "#87c03f";
+  ctx.fillStyle = "#d0d611";
   ctx.beginPath();
   ctx.arc(x,y,size,c+pos,c+pos+width,false);
   ctx.lineTo(x,y); 
@@ -45,7 +45,7 @@
   ctx.fill();
 
   pos += width;
-  ctx.fillStyle = "#70ac21";
+  ctx.fillStyle = "#d68813";
   ctx.beginPath();
   ctx.arc(x,y,size,c+pos,c+pos+width,false);
   ctx.lineTo(x,y); 
@@ -53,7 +53,7 @@
   ctx.fill();
 
   pos += width;
-  ctx.fillStyle = "#378d42";
+  ctx.fillStyle = "#d64915";
   ctx.beginPath();
   ctx.arc(x,y,size,c+pos,c+pos+width,false);
   ctx.lineTo(x,y); 
@@ -61,7 +61,7 @@
   ctx.fill();
 
   pos += width;
-  ctx.fillStyle = "#046b34";
+  ctx.fillStyle = "#d61818";
   ctx.beginPath();
   ctx.arc(x,y,size,c+pos,c+pos+width,false);
   ctx.lineTo(x,y); 
