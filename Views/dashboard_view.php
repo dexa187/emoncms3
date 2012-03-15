@@ -85,7 +85,7 @@ $(function() {
       $("#editsave").show();
   });
 
-
+  var feedNames = [];
   var feedids = [];		// Array that holds ID's of feeds of associative key
   var assoc = [];		// Array for exact values
   var assoc_curve = [];		// Array for smooth change values - creation of smooth dial widget
@@ -94,7 +94,7 @@ $(function() {
 
   update();
   setInterval(update,30000);
-  setInterval(fast_update,30);
+  setInterval(fast_update,15);
   setInterval(slow_update,60000);
   slow_update();
 
@@ -105,6 +105,15 @@ $(function() {
           dataType: 'json',
           success: function(data) 
           { 
+	        var d = new Date();
+            var localOffset = d.getTimezoneOffset() * 60000;
+            var day = d.getDate();
+            var month = d.getMonth();
+            var year = d.getFullYear();
+            var start = Date.UTC(year,month,day-1)+localOffset-1000;
+            var end = Date.UTC(year,month,day)+localOffset;
+              
+            
 
             for (z in data)
             {
@@ -112,10 +121,38 @@ $(function() {
 
               var value = parseFloat(data[z][4]);
               if (value<100) value = value.toFixed(1); else value = value.toFixed(0);
+              var cost = (value *.08692).toFixed(2);
               console.log(newstr);
-              $("."+newstr).html(value);
+              $("."+newstr).html(value+"kWh");
+              $("."+newstr+"_cost").html(cost);
               assoc[newstr] = value*1;
               feedids[newstr] = data[z][0];
+              feedNames[data[z][0]] = newstr;
+ 
+              //ajax call to get yesterday usage to compare to todays
+              //feed must be tagged as Daily we arent interested in realtime feeds
+              if (data[z][2]=="Daily"){
+              $.ajax({
+	            url: path+"feed/data.json",
+                dataType: 'json',
+                data: "id="+data[z][0]+"&start="+start+"&end="+end+"&res=1",
+          		success: function(yesterdayData) 
+              	{
+	              	var feed = this.url.match(/id=\d*/)[0].replace(/id=/,'');
+	            	var yesvalue = parseFloat(yesterdayData[0][1]);
+	            	var percent = ((assoc[feedNames[feed]]/yesvalue)*100).toFixed(0);
+	            	if (yesvalue<100) yesvalue = yesvalue.toFixed(1); else yesvalue = yesvalue.toFixed(0);
+	            	var el = document.getElementById(feedNames[feed]+"_yesterday");
+	            	if (el !== null){
+	            		if (percent > 100) {el.style.background="red"; percent =100;}
+	            		el.style.width = percent+"%";
+            		}
+	            	$("."+feedNames[feed]+"_yesterday").html(percent);
+              		assoc[feedNames[feed]+"_yesterday"] = percent*1;
+              		feedids[feedNames[feed]+"_yesterday"] = data[z][0];
+              		console.log(feedNames[feed]+"_yesterday "+percent);
+              	}});
+          	   }
             }
 
             draw_graphs();
