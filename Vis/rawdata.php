@@ -72,6 +72,13 @@
      //----------------------------------------------------------------------------------------
      // Get window width and height from page size
      //----------------------------------------------------------------------------------------
+     function doStuff() {
+     	if($('#graph').width()===0) {//we want it to match
+        	setTimeout(doStuff, 50);//wait 50 millisecnds then recheck
+        	return;
+    	}
+    
+
      $('#graph').width($('#graph_bound').width());
      $('#graph').height($('#graph_bound').height());
      //----------------------------------------------------------------------------------------
@@ -79,6 +86,8 @@
      var graph_data = [];                              //data array declaration
 
      vis_feed_data(apikey,feedid,start,end,10);
+     }
+     doStuff();
 
      //--------------------------------------------------------------------------------------
      // Graph zooming

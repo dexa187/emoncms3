@@ -134,3 +134,32 @@
         {
 	  return 32 - new Date(iYear, iMonth, 32).getDate();
         }
+        
+        function calcTier(tkwh,firstPrice,secondPrice)
+        {
+	        cost = 0
+	        if (tkwh>1000){
+		        cost = (firstPrice * 1000)+(secondPrice * (tkwh-1000));
+		        return cost;
+	    	}else{
+			    cost = (firstPrice * tkwh);
+			    return cost;
+			}
+		}
+		
+		function firstTier(tkwh){
+			if (tkwh>1000){
+				return 1000;
+			}else{
+				return tkwh;
+			}
+		}
+		
+		function secondTier(tkwh){
+			if (tkwh>1000){
+				return (tkwh-1000);
+			}else{
+				return 0;
+			}
+		}
+

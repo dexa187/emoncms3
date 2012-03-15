@@ -68,7 +68,6 @@
    $(function () {
 
      var placeholder = $("#placeholder");
-
       $('#graph').width($('#graph_bound').width());
       $('#graph').height($('#graph_bound').height());
 
@@ -81,6 +80,9 @@
       {				//Initial time window
         start = ((new Date()).getTime())-timeWindow;		//Get start time
         end = (new Date()).getTime();				//Get end time
+        
+      $('#graph').width($('#graph_bound').width());
+      $('#graph').height($('#graph_bound').height());
 
        var res = Math.round( ((end-start)/10000000) );			//Calculate resolution
        if (res<1) res = 1;
@@ -104,7 +106,6 @@
           } 
         });
       }
-
 
      //----------------------------------------------------------------------------------------------
      // Operate buttons
