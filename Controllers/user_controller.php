@@ -35,9 +35,16 @@
 
       $password = db_real_escape_string($_GET['pass']);
       $result = user_logon($username,$password);
-      if ($result == 0) $output = "invalid username or password"; else $output = "login successful";
-
-      if ($format == 'html') header("Location: ../dashboard/view");
+      if ($result == 0) 
+      {
+	    $output = "invalid username or password";
+	    echo "invalid user or password";
+  	  }
+      else 
+      {
+        $output = "login successful";
+        if ($format == 'html') header("Location: ../dashboard/view");
+      }
     }
 
     //---------------------------------------------------------------------------------------------------------
