@@ -19,7 +19,9 @@
         password varchar(64),
         salt varchar(3),
         apikey_write varchar(64),
-        apikey_read varchar(64)
+        apikey_read varchar(64),
+        lastlogin DATETIME,
+        admin INT NOT NULL
       )"); 
 
   db_query(
@@ -64,6 +66,25 @@
   (
     userid int,
     content text
+  )");
+
+  db_query(
+  "CREATE TABLE notify
+  (
+    userid int,
+    feedid int,
+    onvalue FLOAT,
+    onvalue_sent bool,
+    oninactive bool,
+    oninactive_sent bool,
+    periodic bool
+  )");
+
+  db_query(
+  "CREATE TABLE notify_mail
+  (
+    userid int,
+    recipients text
   )");
 
 

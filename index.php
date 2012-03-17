@@ -20,7 +20,12 @@
   ini_set('display_errors','on');
   error_reporting(E_ALL ^ E_NOTICE);
 
-  $path = dirname("http://".$_SERVER['HTTP_HOST'].$_SERVER['SCRIPT_NAME'])."/";
+  // Thanks to seanwg for https addition
+  $ssl = $_SERVER['HTTPS'];
+  echo $ssl;
+  $proto = "http";
+  if ($ssl == "on") $proto = "https";
+  $path = dirname("$proto://".$_SERVER['HTTP_HOST'].$_SERVER['SCRIPT_NAME'])."/";
 
   require "Includes/core.inc.php";
   require "Includes/db.php";
@@ -43,17 +48,20 @@
   $session['read'] = $_SESSION['read'];
   $session['write'] = $_SESSION['write'];
   $session['userid'] = $_SESSION['userid'];
+  $session['admin'] = $_SESSION['admin'];
 
   if ($_GET['apikey']) $session = user_apikey_session_control($_GET['apikey']);
 
-  $content = controller($controller);
+  $output = controller($controller);
+  $message = $output['message'];
+  $content = $output['content']; 
 
   if ($format == 'json')
   {
 	header('content-type: application/json; charset=utf-8');
 	header("access-control-allow-origin: *");
-    echo $_GET['callback'] .$content;
-    if (!$content) print "Sorry, you need a valid apikey or be logged in to see this page";
+    print $message.$content;
+    if (!($message.$content)) print "Sorry, you need a valid apikey or be logged in to see this page";
   }
 
   if ($format == 'html')
@@ -63,7 +71,7 @@
       $menu = view("menu_view.php", array());
     }
     if (!$session['read']) $content = view("user/login_block.php", array());
-    print view("theme/dark/theme.php", array('menu' => $menu, 'user' => $user, 'content' => $content));
+    print view("theme/dark/theme.php", array('menu' => $menu, 'user' => $user, 'content' => $content,'message' => $message));
   }
   
   //----------------------------------------------------

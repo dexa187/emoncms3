@@ -18,26 +18,7 @@ function api_controller()
 
   // POST arduino posts up to emoncms 				
   if ($action == 'post' && $session['write']) $json = db_real_escape_string($_GET['json']);			
-  
 
-
-  // Brultech
-  if ($action == 'brultech')
-  {
-  $devID = $_GET['dev'];
-  $userid = get_id_from_dev($devID);
-    //get api ket by device Id
-    //post c1w,c2w,A1w,A2w,A3w,A4w,A5w
-  $jsona = '{c1w:'.$_GET['c1w'].',c2w:'.$_GET['c2w'].',A1w:'.$_GET['A1w'].',A2w:'.$_GET['A2w'].',A3w:'.$_GET['A3w'].',A4w:'.$_GET['A4w'].',A5w:'.$_GET['A5w'].'}';
-  send_data('http','mckervey.com','6000','filename.php',"serial:$devID $jsona");
-  $datapairs = validate_json($jsona);
-  $time = time();
-  $inputs = register_inputs($userid,$datapairs,$time);
-  process_inputs($userid,$inputs,$time);                        // process inputs to feeds etc
-  $output = "ok";
-
-  }
-  
   if ($json)
   {
     $datapairs = validate_json($json);				// validate json
@@ -45,8 +26,7 @@ function api_controller()
     if (isset($_GET["time"])) $time = intval($_GET["time"]);	// - or use sent timestamp if present
     $inputs = register_inputs($session['userid'],$datapairs,$time);          // register inputs
     process_inputs($session['userid'],$inputs,$time);                        // process inputs to feeds etc
-    $output = "ok";
-    //$output=$json;
+    $output['message'] = "ok";
   }
 
   return $output;
@@ -104,24 +84,6 @@ function api_controller()
     }
   }
   }
-  
-  function send_data($type,$host,$port,$path='/',$data) { 
-    $_err = 'lib sockets::'.__FUNCTION__.'(): '; 
-    $fp = fsockopen($host,$port,$errno,$errstr,$timeout=5); 
-    if($fp){ 
-	    //error_log("$data");
-        fputs($fp,"$data\r\n");
-//	    fputs($fp, "POST $path HTTP/1.1\r\n"); 
- //       fputs($fp, "Host: $host\r\n"); 
- //       fputs($fp, "Content-type: application/x-www-form-urlencoded\r\n"); 
- //       fputs($fp, "Content-length: ".strlen($str)."\r\n"); 
- //       fputs($fp, "Connection: close\r\n\r\n"); 
- //       fputs($fp, $str."\r\n\r\n"); 
-
-        //while(!feof($fp)) $d .= fgets($fp,4096); 
-        fclose($fp); 
-    } return $d; 
-} 
 
 ?>
 

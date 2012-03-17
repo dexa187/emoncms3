@@ -36,6 +36,8 @@
     $list[13] = array( "phaseshift" ,		0,		"phaseshift"		);
     $list[14] = array( "Subtract from feed",	2,		"subtract_from" );
     $list[15] = array( "Add to feed",		2,		"add_to" 			);
+    $list[16] = array( "accumulator" ,		2,		"accumulator"		);
+    $list[17] = array( "rate of change" ,	2,		"ratechange"		);
     // $list[14] = array( "save_to_input" ,	4,		"save_to_input"		);
     // $list[15] = array( "+ feed",		3,		"add_feed"		);
 
@@ -367,11 +369,45 @@
     return $value;
   }
   //---------------------------------------------------------------------------------
-  function phaseshift($arg,$time,$value)
+  function phaseshift($feedid,$time,$value)
   {
     $rad = acos($value);
     $rad = $rad + (($arg/360.0) * (2.0*3.14159265));
     return cos($rad);
+  }
+
+  //--------------------------------------------------------------------------------
+  // Display the rate of change for the current and last entry
+  //--------------------------------------------------------------------------------
+  function ratechange($feedid,$time_now,$value)
+  {
+	// Get the feed
+	$feedname = "feed_".trim($feedid)."";
+	$time = date("Y-n-j H:i:s", $time_now);
+
+	// Get the current input id 
+	$result = db_query("Select * from input where processList like '%:$feedid%';");
+	$rowfound = db_fetch_array($result);
+	if ($rowfound)
+	{
+		$inputid = trim($rowfound['id']);
+		$processlist = $rowfound['processList'];
+		// Now get the feed for the log to feed command for the input 
+		$logfeed = preg_match('/1:(\d+)/',$processlist,$matches);
+		$logfeedid = trim($matches[1]);
+		// Now need to get the last but one value in the main log to feed table
+		$oldfeedname = "feed_".trim($logfeedid)."";
+		$lastentry = db_query("Select * from $oldfeedname order by time desc LIMIT 2;");  
+		$lastentryrow = db_fetch_array($lastentry); 
+		// Calling again so can get the 2nd row
+		$lastentryrow = db_fetch_array($lastentry);
+		$prevValue = trim($lastentryrow['data']);
+		$ratechange = $value - $prevValue;
+		// now put this rate change into the correct feed table
+		db_query("INSERT INTO $feedname (time,data) VALUES ('$time','$ratechange');");
+		db_query("UPDATE feeds SET time='$time', value='$ratechange' WHERE id='$feedid';");
+	}
+	
   }
 
 function save_to_input($arg,$time,$value)
@@ -387,6 +423,19 @@ function save_to_input($arg,$time,$value)
     }
 
   return $value;
+}
+
+function accumulator($arg,$time,$value)
+{
+   $feedid = $arg;
+
+   $last_value = get_feed_value($feedid);
+
+   $value = $last_value+$value;
+
+   insert_feed_data($feedid,$time,$value);
+
+   return $value;
 }
 
 
