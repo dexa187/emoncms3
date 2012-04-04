@@ -30,6 +30,7 @@
   require "Includes/core.inc.php";
   require "Includes/db.php";
   require "Models/user_model.php";
+  require "Models/statistics_model.php";
   $e = db_connect();
 
   $q = preg_replace('/[^.\/A-z]/','',$_GET['q']); // filter out all except a-z / . 
@@ -43,7 +44,7 @@
 
   if ($e == 2) {echo "no settings.php"; die;}
   if ($e == 3) {echo "db settings error"; die;}
-  if ($e == 4) require "Includes/setup.php";
+  if ($e == 4) header("Location: setup.php");
 
   $session['read'] = $_SESSION['read'];
   $session['write'] = $_SESSION['write'];
@@ -73,6 +74,8 @@
     if (!$session['read']) $content = view("user/login_block.php", array());
     print view("theme/dark/theme.php", array('menu' => $menu, 'user' => $user, 'content' => $content,'message' => $message));
   }
+
+  if ($controller == "api" && $action == "post") inc_uphits_statistics($session['userid']); else inc_dnhits_statistics($session['userid']);
   
   //----------------------------------------------------
 ?>
