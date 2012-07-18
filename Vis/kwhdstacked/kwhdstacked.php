@@ -10,14 +10,16 @@
     Part of the OpenEnergyMonitor project:
     http://openenergymonitor.org
 -->
-  <?php $path = "YOUR EMONCMS PATH"; ?>
+  <?php $path = "YOUR EMONCMS PATH";
+  $path = dirname("http://".$_SERVER['HTTP_HOST'].str_replace('Vis/kWhdStacked', '', $_SERVER['SCRIPT_NAME']))."/";
+  ?>
 
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <script language="javascript" type="text/javascript" src="<?php echo $path; ?>Vis/flot/jquery.js"></script>
-    <script language="javascript" type="text/javascript" src="<?php echo $path; ?>Vis/flot/jquery.flot.js"></script>
-    <script language="javascript" type="text/javascript" src="<?php echo $path; ?>Vis/flot/jquery.flot.stack.js"></script>
-    <script language="javascript" type="text/javascript" src="<?php echo $path; ?>Vis/flot/date.format.js"></script>
+    <script language="javascript" type="text/javascript" src="<?php echo $path; ?>flot/jquery.js"></script>
+    <script language="javascript" type="text/javascript" src="<?php echo $path; ?>flot/jquery.flot.js"></script>
+    <script language="javascript" type="text/javascript" src="<?php echo $path; ?>flot/jquery.flot.stack.js"></script>
+    <script language="javascript" type="text/javascript" src="<?php echo $path; ?>flot/date.format.js"></script>
     <script language="javascript" type="text/javascript" src="kwhd_functions.js"></script>
 
     <?php
@@ -44,14 +46,14 @@
       var dataA = <?php echo json_encode($dataA); ?>;    
       var dataB = <?php echo json_encode($dataB); ?>;
 
-      //var power = <?php echo $power; ?>;    
+    
       var path = "<?php echo $path; ?>";  
 
       // API key
-      var apikey = 'YOUR APIKEY';
+      var apikey = '91e8e1fd0780b1b8d99a4e219c31455e';
 
-      $(function () 
-      {
+      //$(function () 
+      //{
         $('#placeholder').width($('#test').width());
         $('#placeholder').height($('#test').height());
 
@@ -118,7 +120,7 @@
             xaxis: { mode: "time"}
           });
         }
-     });
+     //});
     </script>
   </body>
 </html>

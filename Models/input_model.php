@@ -36,11 +36,6 @@
     set_input_processlist($id,$list);
   }
 
-  function reset_input_process($userid,$id)
-  {
-    set_input_processlist($id,"");
-  }
-
   function get_user_inputs($userid)
   {
     $result = db_query("SELECT * FROM input WHERE userid = '$userid'");
@@ -48,7 +43,7 @@
     if ($result) {
       while ($row = db_fetch_array($result)) {
         if ($row['status']!=1){ // 1 is a deleted input
-        $inputs[] = array($row['id'],$row['name'],strtotime($row['time'])*1000,$row['value']);
+        $inputs[] = array($row['id'],$row['name'],$row['time'],$row['value']);
         }
       }
     }

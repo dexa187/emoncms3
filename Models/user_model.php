@@ -22,8 +22,7 @@
       session_regenerate_id(); 
       $session['userid'] = $userid;
       $session['read'] = 1;
-      $session['write'] = 0;
-      $session['admin'] = 0;    
+      $session['write'] = 0;   
     }
 
     $userid = get_apikey_write_user($apikey_in);
@@ -33,7 +32,6 @@
       $session['userid'] = $userid;
       $session['read'] = 1;
       $session['write'] = 1;
-      $session['admin'] = 0;  
   
     }
     //----------------------------------------------------
@@ -113,7 +111,7 @@
 
   function user_logon($username,$password)  
   {
-    $result = db_query("SELECT id,password,admin, salt FROM users WHERE username = '$username'");
+    $result = db_query("SELECT id,password, salt FROM users WHERE username = '$username'");
     $userData = db_fetch_array($result);
     $hash = hash('sha256', $userData['salt'] . hash('sha256', $password) );
     
@@ -130,7 +128,6 @@
       $_SESSION['userid'] = $userData['id'];
       $_SESSION['read'] = 1;
       $_SESSION['write'] = 1;
-      $_SESSION['admin'] = $userData['admin'];
       $success = 1;
     }
     return $success;
@@ -140,7 +137,6 @@
   {
     $_SESSION['read'] = 0;
     $_SESSION['write'] = 0;
-    $_SESSION['admin'] = 0;
     session_destroy();
   }
 
@@ -157,40 +153,5 @@
     $row = db_fetch_array($result);
     return $row['username'];
   }
-
-  function change_password($userid,$oldpass,$newpass)
-  {
-    $result = db_query("SELECT password, salt FROM users WHERE id = '$userid'");
-    $userData = db_fetch_array($result);
-    $hash = hash('sha256', $userData['salt'] . hash('sha256', $oldpass) );	// hash of oldpass
-
-    if ($hash == $userData['password']) 
-    {
-      $hash = hash('sha256', $newpass);
-      $string = md5(uniqid(rand(), true));
-      $salt = substr($string, 0, 3);
-      $hash = hash('sha256', $salt . $hash);
-      db_query("UPDATE users SET password = '$hash', salt = '$salt' WHERE id = '$userid'"); 
-      return 1;	// success
-    }
-    else
-    {
-      return 0; // failed
-    }
-  }
-
-  function get_user_list()
-  {
-    $result = db_query("SELECT id, username, admin FROM users");
-    $userlist = array();
-    while ($row = db_fetch_array($result))
-    {
-      $userlist[] = array('userid'=>$row['id'],'name'=>$row['username'],'admin'=>$row['admin']);
-    }
-
-    return $userlist;
-  }
-
-
 
 ?>

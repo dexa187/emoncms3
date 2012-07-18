@@ -68,8 +68,7 @@ function compare($x, $y)
     $feed_result = db_query("SELECT * FROM feeds WHERE id = '$feedid'");
     $feed_row = db_fetch_array($feed_result);
     if ($feed_row['status'] != 1) { // if feed is not deleted
-      $size = get_feedtable_size($feed_row['id']);
-      $feed = array($feed_row['id'],$feed_row['name'],$feed_row['tag'],strtotime($feed_row['time'])*1000,$feed_row['value'],$size);
+      $feed = array($feed_row['id'],$feed_row['name'],$feed_row['tag'],$feed_row['time'],$feed_row['value']);
     }
     return $feed;
   }
@@ -83,9 +82,9 @@ function compare($x, $y)
     while ($row = db_fetch_array($result))
     {
       $feedid = $row['feedid'];
-      $result2 = db_query("SELECT name FROM feeds WHERE id='$feedid' AND status = 0");
-      $row_name = db_fetch_array($result2);
-      if ($name == $row_name['name']) return $feedid;
+      $result = db_query("SELECT name FROM feeds WHERE id='$feedid'");
+      $row_name = db_fetch_array($result);
+      if ($key == $row_name['name']) return $feedid;
     }
     return 0;
   }
@@ -271,28 +270,6 @@ function compare($x, $y)
 
     if ($row) return 1;
     return 0;
-  }
-
-  function get_feedtable_size($feedid)
-  {
-    $feedname = "feed_".$feedid;
-    $result = db_query("SHOW TABLE STATUS LIKE '$feedname'");
-    $row = db_fetch_array($result);
-    $tablesize = $row['Data_length']+$row['Index_length'];
-    return $tablesize;
-  }
-
-  function get_user_feeds_size($userid)
-  {
-    $result = db_query("SELECT * FROM feed_relation WHERE userid = '$userid'");
-    $total = 0;
-    if ($result) {
-      while ($row = db_fetch_array($result)) {
-        $total += get_feedtable_size($row['feedid']);
-      }
-    }
-
-    return $total;
   }
 
 

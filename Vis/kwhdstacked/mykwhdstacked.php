@@ -38,7 +38,7 @@
     ?>
 
   </head>
-  <body style="margin: 0px; padding:10px; font-family: arial; background-color:rgb(245,245,235);">
+  <body style="margin: 0px; padding:10px; font-family: arial;">
 
     
     <div id="test" style="height:100%; width:100%; position:relative; ">
@@ -87,7 +87,8 @@
             if (view==0)
             {
               var d = new Date();
-              d.setTime(item.datapoint[0]);
+              var localOffset = d.getTimezoneOffset() * 60000;
+              d.setTime(item.datapoint[0]+localOffset);
               for (i=0; i < data.length;i++){
 	    		days[i]= get_days_month(data[i],d.getMonth(),d.getFullYear());    
               }
@@ -133,8 +134,9 @@
                     var x = item.datapoint[0].toFixed(2),
                         y = item.datapoint[1].toFixed(2);
                     var d = new Date();
+                    var localOffset = d.getTimezoneOffset() * 60000;
                     d.setTime(item.datapoint[0]);
-                    var mdate = new Date(item.datapoint[0]);
+                    var mdate = new Date(item.datapoint[0]+localOffset);
 
                     if (view==0) showTooltip(pos.pageX, pos.pageY, item.series.label +"<br/>"+mdate.format("mmm yyyy")+"<br/>"+"Energy Used:"+(item.datapoint[1]-item.datapoint[2]).toFixed(1)+" kWh" +"<br/>"+"Cost: $" +((item.datapoint[1]-item.datapoint[2])*.086).toFixed(2));
 					if (view==1) showTooltip(item.pageX, item.pageY, item.series.label +"<br/>"+mdate.format("mmm dS yyyy")+"<br/>"+"Energy Used:"+(item.datapoint[1]-item.datapoint[2]).toFixed(1)+" kWh" +"<br/>"+"Cost: $" +((item.datapoint[1]-item.datapoint[2])*.086).toFixed(2));

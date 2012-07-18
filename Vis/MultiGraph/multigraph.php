@@ -9,7 +9,9 @@
     Part of the OpenEnergyMonitor project:
     http://openenergymonitor.org
 -->
-  <?php $path = "YOUR EMONCMS DIRECTORY"; ?>
+  <?php $path = "/Vis";
+  $path = dirname("http://".$_SERVER['HTTP_HOST'].str_replace('Vis/MultiGraph', '', $_SERVER['SCRIPT_NAME']))."/";
+  ?>
 
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
@@ -46,7 +48,7 @@
     var path = "<?php echo $path; ?>";  
 
     // API key
-    var apikey = 'YOUR APIKEY';
+    var apikey = '91e8e1fd0780b1b8d99a4e219c31455e';
 
     $('#placeholder').width($('#graph_bound').width());
     $('#placeholder').height($('#graph_bound').height());

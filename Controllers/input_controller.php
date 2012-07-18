@@ -19,8 +19,6 @@ function input_controller()
   require "Models/input_model.php";
   global $session, $action, $format;
 
-  $output['content'] = "";
-  $output['message'] = "";
   //---------------------------------------------------------------------------------------------------------
   // List inputs
   // http://yoursite/emoncms/input/list.html
@@ -30,8 +28,8 @@ function input_controller()
   {
     $inputs = get_user_inputs($session['userid']);
 
-    if ($format == 'json') $output['content'] = json_encode($inputs);
-    if ($format == 'html') $output['content'] = view("input/list_view.php", array('inputs' => $inputs));
+    if ($format == 'json') $output = json_encode($inputs);
+    if ($format == 'html') $output = view("input/list_view.php", array('inputs' => $inputs));
   }
 
   //---------------------------------------------------------------------------------------------------------
@@ -41,15 +39,8 @@ function input_controller()
   if ($action == "delete" && $session['write'])
   { 
     delete_input($session['userid'] ,intval($_GET["id"]));
-    $output['message'] = "Input deleted";
-  }
-
-  if ($action == "resetprocess" && $session['write'])
-  { 
-    $inputid = intval($_GET["inputid"]);
-    reset_input_process($session['userid'], $inputid );
-    $output['message'] = "Process list has been reset";
-    if ($format == 'html') header("Location: ../process/list?inputid=".$inputid);	// Return to feed list page
+    $output = "input deleted";
+    if ($format == 'html') header("Location: list");
   }
 
   return $output;
