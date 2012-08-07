@@ -20,60 +20,128 @@
   // The html content on this page could be seperated out into a view
   //---------------------------------------------------------------------
 
+  // no direct access
+  defined('EMONCMS_EXEC') or die(_('Restricted access'));
+
   function vis_controller()
   {
     require "Models/feed_model.php";
     global $session, $action, $format;
 
-    if ($session['read']) $apikey = get_apikey_read($session['userid']);
+    if ($session['read'])
+    {
+    	$apikey = get_apikey_read($session['userid']);
+    }
 
-    $content = '<div style="margin-right:3%; margin-left:3%;">';
+    if ($action == 'list' && $session['write'])
+    {
+      $user = get_user($session['userid']);
+      $output['content'] = view("api_view.php", array('user' => $user));
+    }
 
-    // emoncms/vis/realtime?feedid=16&feedname=power
+
+    // vis/realtime?feedid=1
     if ($action == "realtime" && $session['read'])
     {
-      $feedid = intval($_GET['feedid']); $feedname = get_feed_name($feedid);
-
-      $content .= "<h2>Realtime: ".$feedname."</h2>";
-      $content .= '<div class="lightbox" style="margin-bottom:20px; "><iframe style="width:100%; height:400px;" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="'.$GLOBALS['path'].'Vis/realtime.php?apikey='.$apikey.'&feedid='.$feedid.'"></iframe></div>';
-
-      $content .= "<div class='lightbox'>";
-      $content .= "<h3>Embed this graph</h3>";
-      $content .= htmlspecialchars('<iframe style="width:100%; height:400px;" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="'.$GLOBALS['path'].'Vis/realtime.php?apikey='.$apikey.'&feedid='.$feedid.'"></iframe>');
-      $content .= "</div>";
+      $feedid = intval($_GET['feedid']);
+      $output['content'] = view("vis/realtime.php", array('feedid'=>$feedid,'feedname'=>get_feed_name($feedid)));
     }
 
-    // emoncms/vis/rawdata?feedid=16&feedname=power
+    // vis/rawdata?feedid=1
     if ($action == "rawdata" && $session['read'])
     {
-      $feedid = intval($_GET['feedid']); $feedname = get_feed_name($feedid);
-
-      $content .= "<h2>Raw data: ".$feedname."</h2><p>With Level-of-detail zooming</p>";
-      $content .= '<div class="lightbox" style="margin-bottom:20px"><iframe style="width:100%; height:400px;" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="'.$GLOBALS['path'].'Vis/rawdata.php?apikey='.$apikey.'&feedid='.$feedid.'"></iframe></div>';
-
-      $content .= "<div class='lightbox'>";
-      $content .= "<h3>Embed this graph</h3>";
-      $content .= htmlspecialchars('<iframe style="width:100%; height:400px;" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="'.$GLOBALS['path'].'Vis/rawdata.php?apikey='.$apikey.'&feedid='.$feedid.'"></iframe>');
-      $content .= "</div>";
+      $feedid = intval($_GET['feedid']);
+      $output['content'] = view("vis/rawdata.php", array('feedid'=>$feedid,'feedname'=>get_feed_name($feedid)));
     }
 
-    // emoncms/vis/bargraph?feedid=16&feedname=power
+    // vis/bargraph?feedid=2
     if ($action == "bargraph" && $session['read'])
     {
-      $feedid = intval($_GET['feedid']); $feedname = get_feed_name($feedid);
+      $feedid = intval($_GET['feedid']);
+      $output['content'] = view("vis/bargraph.php", array('feedid'=>$feedidtrystan,'feedname'=>get_feed_name($feedid)));
+    }
 
-      $content .= "<h2>Bar graph view: ".$feedname."</h2>";
-      $content .= '<div class="lightbox" style="margin-bottom:20px"><iframe style="width:100%; height:400px;" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="'.$GLOBALS['path'].'Vis/bargraph.php?apikey='.$apikey.'&feedid='.$feedid.'"></iframe></div>';
+    if ($action == 'smoothie' && $session['read'])
+    {
+      $output['content'] = view("vis/smoothie/smoothie.php", array());
+    }
 
-      $content .= "<div class='lightbox'>";
-      $content .= "<h3>Embed this graph</h3>";
-      $content .= htmlspecialchars('<iframe style="width:100%; height:400px;" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="'.$GLOBALS['path'].'Vis/bargraph.php?apikey='.$apikey.'&feedid='.$feedid.'"></iframe>');
-      $content .= "</div>";
+    // vis/histgraph?feedid=3
+    if ($action == "histgraph" && $session['read'])
+    {
+      $feedid = intval($_GET['feedid']);
+      $output['content'] = view("vis/histgraph.php", array('feedid'=>$feedid,'feedname'=>get_feed_name($feedid)));
+    }
+
+    // vis/dailyhistogram?power=  &kwhd=  &whw= 
+    if ($action == 'dailyhistogram' && $session['read'])
+    {
+      $output['content'] = view("vis/dailyhistogram/dailyhistogram.php", array());
+    }
+
+    if ($action == 'zoom' && $session['read'])
+    {
+      $output['content'] = view("vis/zoom/zoom.php", array());
+    }
+    
+    if ($action == 'comparison' && $session['read'])
+    {
+      $output['content'] = view("vis/comparison/comparison.php", array());
+    }
+
+    if ($action == 'stacked' && $session['read'])
+    {
+      $output['content'] = view("vis/stacked.php", array());
+    }
+
+    if ($action == 'threshold' && $session['read'])
+    {
+      $output['content'] = view("vis/threshold.php", array());
+    }
+
+    if ($action == 'simplezoom' && $session['read'])
+    {
+      $output['content'] = view("vis/simplezoom.php", array());
+    }
+
+    if ($action == "orderbars" && $session['read'])
+    {
+      $feedid = intval($_GET['feedid']);
+      $output['content'] = view("vis/orderbars.php", array('feedid'=>$feedid,'feedname'=>get_feed_name($feedid)));
+    }
+    
+    if ($action == 'highstacked' && $session['read'])
+    {
+      $output['content'] = view("vis/highstacked.php", array());
+    }
+    
+    if ($action == 'highlive' && $session['read'])
+    {
+      $output['content'] = view("vis/highlive.php", array());
+    }
+
+    if ($action == 'orderthreshold' && $session['read'])
+    {
+      $output['content'] = view("vis/orderthreshold.php", array());
+    }
+
+	elseif ($action == 'multigraph' && $session['read'])
+    {
+      if ($session['write'])
+      {
+      	$write_apikey = get_apikey_write($session['userid']);
+      }
+      $output['content'] = view("vis/multigraph.php", array('write_apikey'=>$write_apikey));
+    }
+
+    // vis/rawdata?feedid=1
+    if ($action == "edit" && $session['write'])
+    {
+      $feedid = intval($_GET['feedid']);
+      $output['content'] = view("vis/edit.php", array('feedid'=>$feedid,'feedname'=>get_feed_name($feedid), 'type'=>get_feed_datatype($feedid)));
     }
  
-    $content .=" </div>";
-
-    return $content;
+    return $output;
   }
 
 ?>

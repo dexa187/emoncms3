@@ -14,11 +14,17 @@
     delete?id=1				write
 
   */
+
+  // no direct access
+  defined('EMONCMS_EXEC') or die('Restricted access');
+
 function input_controller()
 {
   require "Models/input_model.php";
   global $session, $action, $format;
 
+  $output['content'] = "";
+  $output['message'] = "";
   //---------------------------------------------------------------------------------------------------------
   // List inputs
   // http://yoursite/emoncms/input/list.html
@@ -28,19 +34,29 @@ function input_controller()
   {
     $inputs = get_user_inputs($session['userid']);
 
-    if ($format == 'json') $output = json_encode($inputs);
-    if ($format == 'html') $output = view("input/list_view.php", array('inputs' => $inputs));
+    if ($format == 'json') $output['content'] = json_encode($inputs);
+    if ($format == 'html') $output['content'] = view("input/list_view.php", array('inputs' => $inputs));
   }
 
   //---------------------------------------------------------------------------------------------------------
   // Delete an input
   // http://yoursite/emoncms/input/delete?id=1
   //---------------------------------------------------------------------------------------------------------
-  if ($action == "delete" && $session['write'])
+  elseif ($action == "delete" && $session['write'])
   { 
     delete_input($session['userid'] ,intval($_GET["id"]));
-    $output = "input deleted";
-    if ($format == 'html') header("Location: list");
+    $output['message'] = _("Input deleted");
+  }
+
+  elseif ($action == "resetprocess" && $session['write'])
+  { 
+    $inputid = intval($_GET["inputid"]);
+    reset_input_process($session['userid'], $inputid );
+    $output['message'] = _("Process list has been reset");
+    if ($format == 'html')
+    {
+    	header("Location: ../process/list?inputid=".$inputid);	// Return to feed list page
+	}
   }
 
   return $output;

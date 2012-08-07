@@ -15,6 +15,9 @@
 
   */
 
+  // no direct access
+  defined('EMONCMS_EXEC') or die('Restricted access');
+
   function admin_controller()
   {
     require "Models/feed_model.php";
@@ -27,16 +30,17 @@
     // Gets the user list and user memory use
     // http://yoursite/emoncms/admin/users
     //---------------------------------------------------------------------------------------------------------
-    if ($action == '' && $session['write'] && $session['admin']) {
+    if ($action == '' && $session['write'] && $session['admin'])
+    {
       $userlist = get_user_list();
-      $i=0; $total_memuse = 0;
-      foreach ($userlist as $user) {
+      $total_memuse = 0;
+      foreach ($userlist as $user)
+      { // Improved foreach loop
         $stats = get_statistics($user['userid']);
-        $userlist[$i]['uphits'] = $stats['uphits'];
-        $userlist[$i]['dnhits'] = $stats['dnhits'];
-        $userlist[$i]['memuse'] = $stats['memory'];
-        $total_memuse += $userlist[$i]['memuse'];
-        $i++;
+        $user['uphits'] = $stats['uphits'];
+        $user['dnhits'] = $stats['dnhits'];
+        $user['memuse'] = $stats['memory'];
+        $total_memuse += $user['memuse'];
       }
 
       usort($userlist, 'user_sort');	// sort by highest memory user first
@@ -50,12 +54,7 @@
 
 function user_sort($x, $y)
 {
- if ( $x['memuse'] == $y['memuse'] )
-  return 0;
- else if ( $x['memuse'] > $y['memuse'] )
-  return -1;
- else
-  return 1;
+	return $y['memuse'] - $x['memuse'];
 }
 
 ?>

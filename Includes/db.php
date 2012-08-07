@@ -1,6 +1,10 @@
 <?php 
-  $mysqli = 0;
 
+  // no direct access
+  defined('EMONCMS_EXEC') or die('Restricted access');
+
+  $mysqli = 0; 
+  
   /*
    All Emoncms code is released under the GNU Affero General Public License.
    See COPYRIGHT.txt and LICENSE.txt.
@@ -13,41 +17,37 @@
 
   function db_connect()
   {
-    global $mysqli;
+    global $mysqli, $server, $username, $password, $database;
+    
     // ERROR CODES
     // 1: success!
-    // 2: no settings.php file
-    // 3: database settings are wrong	
-  
-    $success = 1;	
-
-    if(!file_exists(dirname(__FILE__)."/settings.php"))
-    {
-      $success = 2;
-    }
-    else
-    {
-      require_once ('settings.php');
-      $mysqli = new mysqli($server, $username, $password, $database);
-      if ($mysqli->connect_error) $success = 3;
-    }
-
-    if ($success == 1){ 
-      $result = db_query("SELECT * FROM users");
-      if (!$result) $success = 4;
-    }
-
-    return $success;
+    // 3: database settings are wrong 
+    // 4: launch setup.php
+ 
+    // Lets try to connect
+    $mysqli = new mysqli($server, $username, $password, $database);
+    
+    if ($mysqli->connect_error) 
+      return 3;
+    else                     
+      if (db_query("SELECT id FROM users LIMIT 1"))
+        return 1;
+      else
+        return 4;
   }
 
   function db_query($query)
   {
-    return $GLOBALS['mysqli']->query($query);
+    $ret = $GLOBALS['mysqli']->query($query);
+    if ($ret == false) {echo $GLOBALS['mysqli']->error;}
+    return $ret;
   }
 
   function db_fetch_array($result)
   {
-    return $result->fetch_array();
+    $ret = $result->fetch_array();
+    if ($ret == false) {echo $GLOBALS['mysqli']->error;}
+    return $ret;
   }
 
   function db_num_rows($result)
@@ -65,5 +65,43 @@
     return $GLOBALS['mysqli']->insert_id;
   }
 
+  function table_exists($tablename)
+  {
+    $result = db_query("SELECT DATABASE()");
+    $row = db_fetch_array($result);
+    $database = $row[0];
 
+    $result = db_query("
+        SELECT COUNT(*) AS count 
+        FROM information_schema.tables 
+        WHERE table_schema = '$database' 
+        AND table_name = '$tablename'
+    ");
+
+    $row = db_fetch_array($result);
+    return $row[0];
+  }
+
+  function field_exists($tablename,$field)
+  {
+    $field_exists = 0;
+    $result = db_query("SHOW COLUMNS FROM $tablename");
+    while( $row = db_fetch_array($result) ){
+      if ($row['Field']==$field) $field_exists = 1;
+    }
+    return $field_exists;
+  }
+  
+  function getdatabaseversion()
+  {
+    $result = db_query("SELECT dbversion FROM e3_globals;");
+    $row = db_fetch_array($result);
+    return $row['dbversion']; 
+  }
+
+  function setdatabaseversion($dbversion)
+  {
+    db_query("UPDATE e3_globals SET dbversion=".$dbversion);  
+  }
+  
 ?>

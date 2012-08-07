@@ -9,6 +9,9 @@
     http://openenergymonitor.org
   */
 
+  // no direct access
+  defined('EMONCMS_EXEC') or die('Restricted access');
+
   function confirm_controller()
   {
     $message = preg_replace('/[^\w\s-.<>?:]/','',$_POST['message']);	// filter out all except for alphanumeric white space and dash
@@ -18,7 +21,7 @@
     $action = preg_replace('/[^.\/a-z]/','',$_POST['action']); 		// filter out all except a-z / . 
     $action = db_real_escape_string($action);
 
-    $content = view("confirm_view.php", array('message'=>$message,'id'=>$id, 'action'=>$action));
+    $content['content'] = view("confirm_view.php", array('message'=>$message,'id'=>$id, 'action'=>$action));
 
     return $content;
   }
